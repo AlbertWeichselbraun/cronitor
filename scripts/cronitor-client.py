@@ -12,6 +12,7 @@ from cronitor.notifier.stdout import StdoutNotifier
 
 if len(sys.argv) < 2:
     print(f'{sys.argv[0]} [hourly|weekly]')
+    sys.exit(-1)
 
 config = load(open('cronitor.json'))
 match sys.argv[1]:

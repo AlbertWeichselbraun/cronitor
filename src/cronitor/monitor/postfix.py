@@ -23,7 +23,7 @@ class PostfixMonitor(Monitor):
         output = subprocess.check_output(['postqueue', '-p']).decode("utf-8")
         # one line per item  header
         queue_size = len(output.splitlines()) - 1
-        return dict(postfix_queue=queue_size)
+        return queue_size
 
 
 if __name__ == '__main__':
