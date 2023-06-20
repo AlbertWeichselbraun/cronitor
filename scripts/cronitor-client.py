@@ -21,7 +21,7 @@ match sys.argv[1]:
         notifiers = [StdoutNotifier()]
         Cronitor.cronitor(monitors, notifiers, force=True)
     case 'weekly':
-        monitors = [BorgBackupMonitor(*config['borgbackup_monitor'])]
+        monitors = [BorgBackupMonitor(**config['borgbackup_monitor'])]
         notifiers = [StdoutNotifier()]
         Cronitor.cronitor(monitors, notifiers=notifiers, force=True)
     case _:

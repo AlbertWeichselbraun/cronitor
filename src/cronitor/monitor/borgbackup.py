@@ -19,8 +19,8 @@ class BorgBackupMonitor(Monitor):
             ignore_hosts: hosts to ignore (i.e., we won't trigger an alert if no backup has been conducted within
                 max_age for the hosts).
         """
-        self.archive_path = archive_path
-        self.max_age = timedelta(days=int(max_age))
+        self.archive_path = Path(archive_path)
+        self.max_age = timedelta(days=max_age)
         self.min_backup_count = min_backup_count
         self.ignore_archives = ignore_archives
         self.ignore_hosts = ignore_hosts
