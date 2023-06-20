@@ -36,7 +36,7 @@ class BorgBackupMonitor(Monitor):
                                          if self.min_backup_count and len(last_backups) < self.min_backup_count))
             if notification_required or force:
                 msg.append(f'\n# Backups in archive {path}:')
-                msg += [f'- {host}: {", ".join(last_backups.strftime("%Y-%m-%d"))}'
+                msg += [f'- {host}: {", ".join(b.strftime("%Y-%m-%d") for b in last_backups)}'
                         for host, last_backups in backups.items()]
         return '\n'.join(msg)
 
