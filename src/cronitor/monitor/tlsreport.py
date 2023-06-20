@@ -16,7 +16,7 @@ class TLSReportMonitor(Monitor):
         self.imap_user = imap_user
         self.imap_pass = imap_pass
         self.imap_filter = imap_filter
-        self.max_age = timedelta(days=max_age)
+        self.since = since = date.today() - timedelta(days=max_age)
 
     def compute_stats(self):
         """
@@ -25,13 +25,12 @@ class TLSReportMonitor(Monitor):
             domain statistics.
         """
         stats = defaultdict(dict)
-        since = date.today() - self.max_age
         failures = 0
         with IMAP4_SSL(self.imap_server) as imap:
             imap.login(self.imap_user, self.imap_pass)
             imap.select('INBOX')
             _, messages = imap.search(None, '({} SINCE {})'.format(
-                self.imap_filter, since.strftime("%d-%b-%Y")))
+                self.imap_filter, self.since.strftime("%d-%b-%Y")))
             for msg in messages[0].split(b' '):
                 _, data = imap.fetch(msg, '(RFC822)')
 
@@ -65,18 +64,17 @@ class TLSReportMonitor(Monitor):
 
         return failures, stats
 
-    @staticmethod
-    def format_statisics(stats, failures, since):
+    def format_statisics(self, stats, failures):
         """
         Format the TLS reporting statistics.
         """
         r = []
         if failures > 0:
             r.append("# {} TLS Errors reported between {} and {}!\n".format(
-                failures, since.isoformat(), date.today().isoformat()))
+                failures, self.since.isoformat(), date.today().isoformat()))
         else:
             r.append('# Mail statistics: {} to {}:\n'.format(
-                since.isoformat(), date.today().isoformat()))
+                self.since.isoformat(), date.today().isoformat()))
 
         for no, reporter in enumerate(stats, 1):
             r.append('{}. {}'.format(no, reporter))
@@ -92,5 +90,5 @@ class TLSReportMonitor(Monitor):
             return 'WARNING: failed to access the impact account - ' + str(e)
 
         if failures > 0 or force:
-            return self.format_statisics(stats, failures, since=self.max_age)
+            return self.format_statisics(stats, failures)
         return ''
