@@ -12,9 +12,9 @@ class Cronitor:
             notifiers: a list of notifiers used for sending notifications.
             force: whether to force notifications
         """
-        msg = '\n\n'.join([m.notify(force) for m in monitors])
-        if not msg:
+        messages = list(filter(None, [m.notify(force) for m in monitors]))
+        if not messages:
             return
 
         for n in notifiers:
-            n.send_notification(msg)
+            n.send_notifications(messages)
