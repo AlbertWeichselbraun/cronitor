@@ -11,23 +11,23 @@ from cronitor.monitor import Monitor
 
 class BorgBackupMonitor(Monitor):
 
-    def __init__(self, borgbackup_base_path: Path, max_age: timedelta, min_backup_count: int = 0,
+    def __init__(self, archive_path: Path, max_age: timedelta, min_backup_count: int = 0,
                  ignore_archives: list[str] = tuple(), ignore_hosts: list[str] = tuple()):
         """
         Args:
-            max_age: time period to monitor
+            max_age: maximum backup age to consider in days.
             ignore_hosts: hosts to ignore (i.e., we won't trigger an alert if no backup has been conducted within
                 max_age for the hosts).
         """
-        self.borgbackup_base_path = borgbackup_base_path
-        self.max_age = max_age
+        self.archive_path = archive_path
+        self.max_age = timedelta(days=max_age)
         self.min_backup_count = min_backup_count
         self.ignore_archives = ignore_archives
         self.ignore_hosts = ignore_hosts
 
     def notify(self, force=False):
         msg = []
-        for path in self.borgbackup_base_path.glob('*'):
+        for path in self.archive_path.glob('*'):
             if not path.is_dir() or path.name in self.ignore_archives:
                 continue
             backups = self.parse_borgbackup_output(
