@@ -1,0 +1,22 @@
+{
+	"matrix": {
+	    "homeserver": "",
+	    "user_id": "",
+	    "room_id": "", 
+	    "access_token": ""
+	},
+	"borgbackup_monitor": {
+		"archive_path": "",
+		"max_age": 7,
+		"min_backup_count": 3,
+		"ignore_archives": ["example.com"],
+		"ignore_hosts": ["ubuntu.example.org"]
+	},
+	"tlsreport_monitor": {
+		"imap_server": "",
+                "imap_user": "",
+                "imap_pass": "",
+                "imap_filter": "",
+		"max_age": 7
+	}
+}
