@@ -8,9 +8,9 @@ class PostfixMonitor(Monitor):
 
     def notify(self, force=True):
         if queue_size := self.get_queue_size():
-            return f'# Mail monitoring:\n {queue_size} mails are currently queued.'
+            return f'# Mail monitoring:\n- {queue_size} mails are currently queued.'
         elif force:
-            return '# Mail monitoring:\n Mail queue is empty.'
+            return '# Mail monitoring:\n- Mail queue is empty.'
         else:
             return ''
 

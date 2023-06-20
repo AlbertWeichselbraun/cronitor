@@ -20,7 +20,7 @@ class BorgBackupMonitor(Monitor):
                 max_age for the hosts).
         """
         self.archive_path = archive_path
-        self.max_age = timedelta(days=max_age)
+        self.max_age = timedelta(days=int(max_age))
         self.min_backup_count = min_backup_count
         self.ignore_archives = ignore_archives
         self.ignore_hosts = ignore_hosts
