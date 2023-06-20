@@ -9,14 +9,14 @@ from cronitor import Cronitor
 from cronitor.monitor.postfix import PostfixMonitor
 from cronitor.monitor.borgbackup import BorgBackupMonitor
 from cronitor.monitor.tlsreport import TLSReportMonitor
-from cronitor.notifier.stdout import StdoutNotifier
+from cronitor.notifier.matrix import MatrixNotifier
 
 if len(sys.argv) < 2:
     print(f'{sys.argv[0]} [hourly|daily|weekly]')
     sys.exit(-1)
 
 config = load(open('cronitor.json'))
-notifiers = [StdoutNotifier()]
+notifiers = [MatrixNotifier(**config['matrix'])]
 match sys.argv[1]:
     case 'hourly':
         monitors = [PostfixMonitor()]
