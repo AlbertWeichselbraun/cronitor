@@ -20,12 +20,13 @@ notifiers = [MatrixNotifier(**config['matrix'])]
 match sys.argv[1]:
     case 'hourly':
         monitors = [PostfixMonitor()]
-        Cronitor.cronitor(monitors, notifiers, force=True)
+        Cronitor.cronitor(monitors, notifiers)
     case 'daily':
         monitors = [TLSReportMonitor(**config['tlsreport_monitor'])]
-        Cronitor.cronitor(monitors, notifiers, force=True)
+        Cronitor.cronitor(monitors, notifiers)
     case 'weekly':
-        monitors = [BorgBackupMonitor(**config['borgbackup_monitor'])]
+        monitors = [PostfixMonitor(), TLSReportMonitor(**config['tlsreport_monitor']),
+                    BorgBackupMonitor(**config['borgbackup_monitor'])]
         Cronitor.cronitor(monitors, notifiers=notifiers, force=True)
     case _:
         print(f'Unsupported parameter {sys.argv[1]}.')
