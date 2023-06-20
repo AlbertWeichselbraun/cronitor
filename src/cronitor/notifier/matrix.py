@@ -6,8 +6,12 @@ from cronitor.notifier import Notifier
 
 class MatrixNotifier(Notifier):
 
-    def __init__(self, config: dict[str, str]):
-        self.config = config
+    def __init__(self, homeserver: str, user_id: str, access_token: str, room_id: str):
+        self.homeserver = homeserver
+        self.user_id = user_id
+        self.access_token = access_token
+        self.room_id = room_id
+
 
     @staticmethod
     async def send_matrix_message(homeserver, user_id, access_token, room_id, message):
@@ -29,10 +33,10 @@ class MatrixNotifier(Notifier):
 
     def send_notification(self, msg):
         asyncio.get_event_loop().run_until_complete(
-            self.send_matrix_message(homeserver=self.config['matrix_homeserver'],
-                                     user_id=self.config['matrix_user_id'],
-                                     access_token=self.config['matrix_access_token'],
-                                     room_id=self.config['matrix_room_id'],
+            self.send_matrix_message(homeserver=self.homeserver,
+                                     user_id=self.user_id,
+                                     access_token=self.access_token,
+                                     room_id=self.room_id,
                                      message=msg)
         )
 
