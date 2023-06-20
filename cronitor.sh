@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
 source ./venv/bin/activate
-export PYTHONPATH=$PYTHONPATH:./src/cronitor
+export PYTHONPATH=$PYTHONPATH:./src
 
-python ./scripts/cronitor.py
+python ./scripts/cronitor-client.py
