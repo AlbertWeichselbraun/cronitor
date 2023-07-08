@@ -33,11 +33,20 @@ class MatrixNotifier(Notifier):
 
     def send_notifications(self, messages):
         for msg in messages:
-            asyncio.get_event_loop().run_until_complete(
-                self.send_matrix_message(homeserver=self.homeserver,
-                                         user_id=self.user_id,
-                                         access_token=self.access_token,
-                                         room_id=self.room_id,
-                                         message=msg)
-            )
-
+            if isinstance(msg, str):
+                asyncio.get_event_loop().run_until_complete(
+                    self.send_matrix_message(homeserver=self.homeserver,
+                                             user_id=self.user_id,
+                                             access_token=self.access_token,
+                                             room_id=self.room_id,
+                                             message=msg)
+                )
+            else:
+                for m in msg:
+                    asyncio.get_event_loop().run_until_complete(
+                        self.send_matrix_message(homeserver=self.homeserver,
+                                                 user_id=self.user_id,
+                                                 access_token=self.access_token,
+                                                 room_id=self.room_id,
+                                                 message=m)
+                    )

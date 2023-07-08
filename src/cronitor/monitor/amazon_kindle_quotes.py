@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-from collections import defaultdict
-from imaplib import IMAP4_SSL, IMAP4
-from datetime import date, timedelta
-from cronitor.monitor import Monitor
-from hashlib import md5
+
 import email
+from datetime import date, timedelta
+from hashlib import md5
+from imaplib import IMAP4_SSL
+
+from cronitor.monitor import Monitor
 
 QUOTE_CACHE_FILE = '.cronitor-known-amazon-kindle-quotes'
+
 
 class AmazonKindleQuotes(Monitor):
 
@@ -75,19 +77,11 @@ class AmazonKindleQuotes(Monitor):
         return result
 
     def notify(self, force=True):
-        try:
-            failures, stats = self.get_quotes()
-        except IMAP4.error as e:
-            return 'WARNING: failed to access the impact account - ' + str(e)
-
-        if failures > 0 or force:
-            return self.format_statisics(stats, failures)
-        return ''
+        return AmazonKindleQuotes(**config['amazon_kindle_quotes'])
 
 
 if __name__ == '__main__':
     from json import load
     config = load(open('cronitor.json'))
     akq = AmazonKindleQuotes(**config['amazon_kindle_quotes'])
-    quotes = akq.get_quotes()
-    print(quotes)
+    print(akq.get_quotes())
