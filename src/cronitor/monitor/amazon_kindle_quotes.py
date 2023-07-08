@@ -34,7 +34,7 @@ class AmazonKindleQuotes(Monitor):
         return False
 
     @staticmethod
-    def get_quote(text):
+    def extract_quote(text):
         """
         Extract the quote from the given text.
 
@@ -71,13 +71,13 @@ class AmazonKindleQuotes(Monitor):
                 for response in data:
                     if isinstance(response, tuple):
                         msg = email.message_from_bytes(response[1])
-                        quote = self.get_quote(msg.get_payload())
+                        quote = self.extract_quote(msg.get_payload())
                         if not self.is_known_quote(quote):
                             result.append(quote)
         return result
 
     def notify(self, force=True):
-        return self.get_quote()
+        return self.get_quotes()
 
 
 if __name__ == '__main__':
