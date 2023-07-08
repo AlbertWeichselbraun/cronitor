@@ -77,7 +77,7 @@ class AmazonKindleQuotes(Monitor):
         return result
 
     def notify(self, force=True):
-        return AmazonKindleQuotes(**config['amazon_kindle_quotes'])
+        return self.get_quote()
 
 
 if __name__ == '__main__':
