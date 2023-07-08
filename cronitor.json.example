@@ -1,9 +1,17 @@
 {
 	"matrix": {
-	    "homeserver": "",
-	    "user_id": "",
-	    "room_id": "", 
-	    "access_token": ""
+        "updates": {
+    	    "homeserver": "",
+    	    "user_id": "",
+    	    "room_id": "", 
+    	    "access_token": ""
+        },
+        "delight": {
+    	    "homeserver": "",
+    	    "user_id": "",
+    	    "room_id": "", 
+    	    "access_token": ""
+        }
 	},
 	"borgbackup_monitor": {
 		"archive_path": "",

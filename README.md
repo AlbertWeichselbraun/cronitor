@@ -7,6 +7,7 @@ Monitor services through cron and notifiers.
 - postfix mail queue size
 - mail TLS reports
 - borg backups
+- amazon kindle quotes (publish quotes from Amazon Kindle on matrix)
 
 ## Implemented notifiers:
 
