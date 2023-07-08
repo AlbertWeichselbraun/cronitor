@@ -16,7 +16,7 @@ class TLSReportMonitor(Monitor):
         self.imap_user = imap_user
         self.imap_pass = imap_pass
         self.imap_filter = imap_filter
-        self.since = since = date.today() - timedelta(days=max_age)
+        self.since = date.today() - timedelta(days=max_age)
 
     def compute_stats(self):
         """

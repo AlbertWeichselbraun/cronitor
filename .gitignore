@@ -2,3 +2,4 @@ __pycache__/
 cronitor.json
 .*.swp
 .idea/
+.cronitor-known-amazon-kindle-quotes
