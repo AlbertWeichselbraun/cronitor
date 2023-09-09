@@ -7,6 +7,7 @@ from json import load
 
 from cronitor import Cronitor
 from cronitor.monitor.amazon_kindle_quotes import AmazonKindleQuotes
+from cronitor.monitor.automysqlbackup import AutoMysqlBackup
 from cronitor.monitor.postfix import PostfixMonitor
 from cronitor.monitor.borgbackup import BorgBackupMonitor
 from cronitor.monitor.tlsreport import TLSReportMonitor
@@ -36,7 +37,8 @@ match sys.argv[1]:
         monitors = [AmazonKindleQuotes(**config['amazon_kindle_quotes'])]
         Cronitor.cronitor(monitors, delight_notifier)
     case 'daily':
-        monitors = [TLSReportMonitor(**config['tlsreport_monitor'])]
+        monitors = [TLSReportMonitor(**config['tlsreport_monitor']),
+                    AutoMysqlBackup(**config['automysqlbackup_monitor'])]
         Cronitor.cronitor(monitors, update_notifiers)
     case 'weekly':
         monitors = [PostfixMonitor(), TLSReportMonitor(**config['tlsreport_monitor']),

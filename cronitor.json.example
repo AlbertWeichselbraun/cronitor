@@ -20,6 +20,10 @@
 		"ignore_archives": ["example.com"],
 		"ignore_hosts": ["ubuntu.example.org"]
 	},
+	"automysqlbackup_monitor": {
+	    "archive_path": "",
+	    "max_age": 2
+	},
 	"tlsreport_monitor": {
 		"imap_server": "",
                 "imap_user": "",
