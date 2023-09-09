@@ -75,9 +75,10 @@ class AmazonKindleQuotes(Monitor):
                         for part in msg.walk():
                             if part.get_content_type() == 'text/plain':
                                 if part.get('Content-Transfer-Encoding', 'utf8') == 'quoted-printable':
-                                    quote = decodestring(part.get_payload()).decode('utf8')
+                                    mail_content = self.extract_quote(decodestring(part.get_payload()).decode('utf8'))
                                 else:
-                                    quote = part.get_payload()
+                                    mail_content = self.extract_quote(part.get_payload())
+                        quote = self.extract_quote(mail_content)
                         if not self.is_known_quote(quote):
                             result.append(quote)
         return result

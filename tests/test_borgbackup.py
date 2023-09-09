@@ -7,7 +7,7 @@ from pathlib import Path
 EXAMPLE_OUTPUT = gzip.open(Path(__file__).parent / 'data' / 'borgbackup.json.gz', 'rt').read()
 
 def test_parse_borgbackup_output():
-    backups = BorgBackupMonitor(max_age=timedelta(days=7)).parse_borgbackup_output(EXAMPLE_OUTPUT,
+    backups = BorgBackupMonitor(archive_path='./', max_age=7).parse_borgbackup_output(EXAMPLE_OUTPUT,
                                                                                    current_date=datetime(2023, 6, 20))
     print(backups)
     assert backups == {

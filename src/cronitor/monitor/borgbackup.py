@@ -11,7 +11,7 @@ from cronitor.monitor import Monitor
 
 class BorgBackupMonitor(Monitor):
 
-    def __init__(self, archive_path: Path, max_age: timedelta, min_backup_count: int = 0,
+    def __init__(self, archive_path: Path, max_age: int, min_backup_count: int = 0,
                  ignore_archives: list[str] = tuple(), ignore_hosts: list[str] = tuple()):
         """
         Args:
