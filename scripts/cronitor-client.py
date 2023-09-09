@@ -20,8 +20,9 @@ config = load(open('cronitor.json'))
 
 # optional: disable notifications for debuging
 if len(sys.argv) > 2 and sys.argv[2] == 'nonotify':
-    update_notifiers = []
-    delight_notifier = []
+    from cronitor.notifier.stdout import StdoutNotifier
+    update_notifiers = [StdoutNotifier()]
+    delight_notifier = [StdoutNotifier()]
 else:
     update_notifiers = [MatrixNotifier(**config['matrix']['updates'])]
     delight_notifier = [MatrixNotifier(**config['matrix']['delight'])]

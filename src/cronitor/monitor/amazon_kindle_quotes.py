@@ -4,6 +4,7 @@ import email
 from datetime import date, timedelta
 from hashlib import md5
 from imaplib import IMAP4_SSL
+from quopri import decodestring
 
 from cronitor.monitor import Monitor
 
@@ -73,7 +74,10 @@ class AmazonKindleQuotes(Monitor):
                         msg = email.message_from_bytes(response[1])
                         for part in msg.walk():
                             if part.get_content_type() == 'text/plain':
-                                quote = part.get_payload()
+                                if part.get('Content-Transfer-Encoding', 'utf8') == 'quoted-printable':
+                                    quote = decodestring(part.get_payload()).decode('utf8')
+                                else:
+                                    quote = part.get_payload()
                         if not self.is_known_quote(quote):
                             result.append(quote)
         return result
