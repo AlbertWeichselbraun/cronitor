@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 
+import re
 from datetime import datetime, timedelta
 from pathlib import Path
 
 from cronitor.monitor import Monitor
+
+RE_DATE = re.compile(r'[\._](\d{4}-\d{2}-\d{2})[\._]')
 
 
 class AutoMysqlBackup(Monitor):
@@ -24,7 +27,7 @@ class AutoMysqlBackup(Monitor):
         # determine the date of the most recent backup
         most_current_date = datetime.strptime('1900-01-01', '%Y-%m-%d')
         for path in self.archive_path.rglob('*.sql.gz'):
-            date = datetime.strptime(str(path.name).split('.')[2], '%Y-%m-%d_%Hh%Mm')
+            date = datetime.strptime(RE_DATE.search(str(path.name)).group(1), '%Y-%m-%d')
             if date > most_current_date:
                 most_current_date = date
 
