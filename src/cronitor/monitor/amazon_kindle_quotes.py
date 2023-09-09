@@ -71,7 +71,9 @@ class AmazonKindleQuotes(Monitor):
                 for response in data:
                     if isinstance(response, tuple):
                         msg = email.message_from_bytes(response[1])
-                        quote = self.extract_quote(msg.get_payload())
+                        for part in msg.walk():
+                            if part.get_content_type() == 'text/plain':
+                                quote = part.get_payload()
                         if not self.is_known_quote(quote):
                             result.append(quote)
         return result

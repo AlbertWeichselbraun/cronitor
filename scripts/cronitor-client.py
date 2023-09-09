@@ -13,17 +13,24 @@ from cronitor.monitor.tlsreport import TLSReportMonitor
 from cronitor.notifier.matrix import MatrixNotifier
 
 if len(sys.argv) < 2:
-    print(f'{sys.argv[0]} [hourly|daily|weekly]')
+    print(f'{sys.argv[0]} [hourly|daily|weekly] [nonotify]')
     sys.exit(-1)
 
 config = load(open('cronitor.json'))
-update_notifiers = [MatrixNotifier(**config['matrix']['updates'])]
-delight_notifier = [MatrixNotifier(**config['matrix']['delight'])]
+
+# optional: disable notifications for debuging
+if len(sys.argv) > 2 and sys.argv[2] == 'nonotify':
+    update_notifiers = []
+    delight_notifier = []
+else:
+    update_notifiers = [MatrixNotifier(**config['matrix']['updates'])]
+    delight_notifier = [MatrixNotifier(**config['matrix']['delight'])]
+
 match sys.argv[1]:
     case 'hourly':
         # postfix
-        monitors = [PostfixMonitor()]
-        Cronitor.cronitor(monitors, update_notifiers)
+        #monitors = [PostfixMonitor()]
+        #Cronitor.cronitor(monitors, update_notifiers)
         # kindle
         monitors = [AmazonKindleQuotes(**config['amazon_kindle_quotes'])]
         Cronitor.cronitor(monitors, delight_notifier)
