@@ -6,6 +6,7 @@ import configparser
 import subprocess
 from collections import namedtuple
 from glob import glob
+from os.path import basename
 from time import time
 from typing import Optional
 
@@ -23,7 +24,7 @@ class WireguardMonitor(Monitor):
 
     def __init__(self, wireguard_config_dir=DEFAULT_CONFIG_DIR, timeout=DEFAULT_TIMEOUT):
         self.timeout = timeout
-        self.interfaces = {name.split('.conf')[0]: self.read_host_from_wl_config(name)
+        self.interfaces = {basename(name).split('.conf')[0]: self.read_host_from_wl_config(name)
                            for name in glob(f'{wireguard_config_dir}/*.conf')}
 
     def notify(self, force=True):
@@ -53,7 +54,8 @@ class WireguardMonitor(Monitor):
             An Endpoint tuple which consists of the host and port of the endpoint.
         """
         config = configparser.ConfigParser()
-        config.read_file(fname)
+        with open(fname) as f:
+            config.read_file(f)
         try:
             return EndPoint(*config.get('Peer', 'Endpoint').split(':'))
         except configparser.NoOptionError:
