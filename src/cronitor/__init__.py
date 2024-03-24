@@ -3,9 +3,10 @@ from cronitor.notifier import Notifier
 
 
 class Cronitor:
-
     @staticmethod
-    def cronitor(monitors: list[Monitor], notifiers: list[Notifier], force: bool = False):
+    def cronitor(
+        monitors: list[Monitor], notifiers: list[Notifier], force: bool = False
+    ):
         """
         Args:
             monitors: a list of monitors to monitor

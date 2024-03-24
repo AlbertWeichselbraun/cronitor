@@ -2,7 +2,6 @@ from abc import abstractmethod
 
 
 class Monitor:
-
     @abstractmethod
     def notify(self, force=True) -> str:
         """

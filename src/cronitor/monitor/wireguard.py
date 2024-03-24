@@ -14,32 +14,33 @@ from cronitor import Monitor
 
 WL_HANDSHAKE = ["wg", "show", "all", "latest-handshakes"]
 
-DEFAULT_CONFIG_DIR = '/etc/wireguard'
+DEFAULT_CONFIG_DIR = "/etc/wireguard"
 DEFAULT_TIMEOUT = 150
 
 EndPoint = namedtuple("EndPoint", "host port")
 
 
 class WireguardMonitor(Monitor):
-
-    def __init__(self, wireguard_config_dir=DEFAULT_CONFIG_DIR, timeout=DEFAULT_TIMEOUT):
+    def __init__(
+        self, wireguard_config_dir=DEFAULT_CONFIG_DIR, timeout=DEFAULT_TIMEOUT
+    ):
         self.timeout = timeout
-        self.interfaces = {basename(name).split('.conf')[0]: self.read_host_from_wl_config(name)
-                           for name in glob(f'{wireguard_config_dir}/*.conf')}
+        self.interfaces = {
+            basename(name).split(".conf")[0]: self.read_host_from_wl_config(name)
+            for name in glob(f"{wireguard_config_dir}/*.conf")
+        }
 
     def notify(self, force=True):
         """
         Check all configured wiregard interfaces and notify the user of frozen ones.
         """
 
-
-
         if queue_size := self.get_queue_size():
-            return f'# Mail monitoring:\n- {queue_size} mails are currently queued.'
+            return f"# Mail monitoring:\n- {queue_size} mails are currently queued."
         elif force:
-            return '# Mail monitoring:\n- Mail queue is empty.'
+            return "# Mail monitoring:\n- Mail queue is empty."
         else:
-            return ''
+            return ""
 
     @staticmethod
     def read_host_from_wl_config(fname: str) -> Optional[EndPoint]:
@@ -57,7 +58,7 @@ class WireguardMonitor(Monitor):
         with open(fname) as f:
             config.read_file(f)
         try:
-            return EndPoint(*config.get('Peer', 'Endpoint').split(':'))
+            return EndPoint(*config.get("Peer", "Endpoint").split(":"))
         except configparser.NoOptionError:
             return None
 
@@ -72,8 +73,15 @@ class WireguardMonitor(Monitor):
         Returns:
             A list of 'interface' and 'time since last handshake' tuples.
         """
-        cmd = WL_HANDSHAKE if not namespace else ['ip', 'netns', 'exec', namespace] + WL_HANDSHAKE
-        return [(iface, time() - int(timestamp))
-                for line in subprocess.run(cmd, check=True, capture_output=True, text=True).stdout.split('\n')
-                for iface, _, timestamp in line.split()]
-
+        cmd = (
+            WL_HANDSHAKE
+            if not namespace
+            else ["ip", "netns", "exec", namespace] + WL_HANDSHAKE
+        )
+        return [
+            (iface, time() - int(timestamp))
+            for line in subprocess.run(
+                cmd, check=True, capture_output=True, text=True
+            ).stdout.split("\n")
+            for iface, _, timestamp in line.split()
+        ]

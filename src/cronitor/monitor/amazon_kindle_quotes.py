@@ -8,11 +8,10 @@ from quopri import decodestring
 
 from cronitor.monitor import Monitor
 
-QUOTE_CACHE_FILE = '.cronitor-known-amazon-kindle-quotes'
+QUOTE_CACHE_FILE = ".cronitor-known-amazon-kindle-quotes"
 
 
 class AmazonKindleQuotes(Monitor):
-
     def __init__(self, imap_server: str, imap_user: str, imap_pass: str, max_age: int):
         self.imap_server = imap_server
         self.imap_user = imap_user
@@ -27,11 +26,11 @@ class AmazonKindleQuotes(Monitor):
         """
         Checks whether the given quote is known.
         """
-        quote_hash = md5(quote.encode('utf8'), usedforsecurity=False).hexdigest()
+        quote_hash = md5(quote.encode("utf8"), usedforsecurity=False).hexdigest()
         if quote_hash in self.known_quote_hashes:
             return True
 
-        open(QUOTE_CACHE_FILE, 'a').write(quote_hash + '\n')
+        open(QUOTE_CACHE_FILE, "a").write(quote_hash + "\n")
         return False
 
     @staticmethod
@@ -44,7 +43,7 @@ class AmazonKindleQuotes(Monitor):
         """
         result = []
         in_quote = False
-        for line in text.split('\n'):
+        for line in text.split("\n"):
             if line.startswith('"'):
                 in_quote = True
             elif in_quote and not line.strip():
@@ -53,7 +52,7 @@ class AmazonKindleQuotes(Monitor):
             if in_quote:
                 result.append(line.strip())
 
-        return ' '.join(result)
+        return " ".join(result)
 
     def get_quotes(self):
         """
@@ -64,20 +63,29 @@ class AmazonKindleQuotes(Monitor):
         result = []
         with IMAP4_SSL(self.imap_server) as imap:
             imap.login(self.imap_user, self.imap_pass)
-            imap.select('INBOX')
-            _, messages = imap.search(None, '(SINCE {})'.format(self.since.strftime("%d-%b-%Y")))
-            for msg in messages[0].split(b' '):
-                _, data = imap.fetch(msg, '(RFC822)')
+            imap.select("INBOX")
+            _, messages = imap.search(
+                None, "(SINCE {})".format(self.since.strftime("%d-%b-%Y"))
+            )
+            for msg in messages[0].split(b" "):
+                _, data = imap.fetch(msg, "(RFC822)")
 
                 for response in data:
                     if isinstance(response, tuple):
                         msg = email.message_from_bytes(response[1])
                         for part in msg.walk():
-                            if part.get_content_type() == 'text/plain':
-                                if part.get('Content-Transfer-Encoding', 'utf8') == 'quoted-printable':
-                                    mail_content = self.extract_quote(decodestring(part.get_payload()).decode('utf8'))
+                            if part.get_content_type() == "text/plain":
+                                if (
+                                    part.get("Content-Transfer-Encoding", "utf8")
+                                    == "quoted-printable"
+                                ):
+                                    mail_content = self.extract_quote(
+                                        decodestring(part.get_payload()).decode("utf8")
+                                    )
                                 else:
-                                    mail_content = self.extract_quote(part.get_payload())
+                                    mail_content = self.extract_quote(
+                                        part.get_payload()
+                                    )
                         quote = self.extract_quote(mail_content)
                         if not self.is_known_quote(quote):
                             result.append(quote)
@@ -87,8 +95,9 @@ class AmazonKindleQuotes(Monitor):
         return self.get_quotes()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from json import load
-    config = load(open('cronitor.json'))
-    akq = AmazonKindleQuotes(**config['amazon_kindle_quotes'])
+
+    config = load(open("cronitor.json"))
+    akq = AmazonKindleQuotes(**config["amazon_kindle_quotes"])
     print(akq.get_quotes())

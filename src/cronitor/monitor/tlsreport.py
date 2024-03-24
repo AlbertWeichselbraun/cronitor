@@ -10,8 +10,14 @@ from json import loads
 
 
 class TLSReportMonitor(Monitor):
-
-    def __init__(self, imap_server: str, imap_user: str, imap_pass: str, imap_filter: str, max_age: int):
+    def __init__(
+        self,
+        imap_server: str,
+        imap_user: str,
+        imap_pass: str,
+        imap_filter: str,
+        max_age: int,
+    ):
         self.imap_server = imap_server
         self.imap_user = imap_user
         self.imap_pass = imap_pass
@@ -28,11 +34,15 @@ class TLSReportMonitor(Monitor):
         failures = 0
         with IMAP4_SSL(self.imap_server) as imap:
             imap.login(self.imap_user, self.imap_pass)
-            imap.select('INBOX')
-            _, messages = imap.search(None, '({} SINCE {})'.format(
-                self.imap_filter, self.since.strftime("%d-%b-%Y")))
-            for msg in messages[0].split(b' '):
-                _, data = imap.fetch(msg, '(RFC822)')
+            imap.select("INBOX")
+            _, messages = imap.search(
+                None,
+                "({} SINCE {})".format(
+                    self.imap_filter, self.since.strftime("%d-%b-%Y")
+                ),
+            )
+            for msg in messages[0].split(b" "):
+                _, data = imap.fetch(msg, "(RFC822)")
 
                 for response in data:
                     if isinstance(response, tuple):
@@ -43,24 +53,32 @@ class TLSReportMonitor(Monitor):
                             continue
 
                         for part in msg.walk():
-                            content_disposition = str(
-                                part.get("Content-Disposition"))
-                            if content_disposition.startswith('attachment'):
+                            content_disposition = str(part.get("Content-Disposition"))
+                            if content_disposition.startswith("attachment"):
                                 content = part.get_payload(decode=True)
                                 content = decompress(content)
                                 j = loads(content)
 
-                                reporter = j['contact-info']
-                                for policy in j['policies']:
-                                    domain = policy['policy']['policy-domain']
+                                reporter = j["contact-info"]
+                                for policy in j["policies"]:
+                                    domain = policy["policy"]["policy-domain"]
                                     if domain not in stats[reporter]:
                                         stats[reporter][domain] = {}
-                                    stats[reporter][domain]['successful'] = stats[reporter][domain].get(
-                                        'successful', 0) + policy['summary']['total-successful-session-count']
-                                    stats[reporter][domain]['failure'] = stats[reporter][domain].get('failure', 0) + \
-                                                                         policy['summary'][
-                                                                             'total-failure-session-count']
-                                    failures += policy['summary']['total-failure-session-count']
+                                    stats[reporter][domain]["successful"] = (
+                                        stats[reporter][domain].get("successful", 0)
+                                        + policy["summary"][
+                                            "total-successful-session-count"
+                                        ]
+                                    )
+                                    stats[reporter][domain]["failure"] = (
+                                        stats[reporter][domain].get("failure", 0)
+                                        + policy["summary"][
+                                            "total-failure-session-count"
+                                        ]
+                                    )
+                                    failures += policy["summary"][
+                                        "total-failure-session-count"
+                                    ]
 
         return failures, stats
 
@@ -70,25 +88,36 @@ class TLSReportMonitor(Monitor):
         """
         r = []
         if failures > 0:
-            r.append("# {} TLS Errors reported between {} and {}!\n".format(
-                failures, self.since.isoformat(), date.today().isoformat()))
+            r.append(
+                "# {} TLS Errors reported between {} and {}!\n".format(
+                    failures, self.since.isoformat(), date.today().isoformat()
+                )
+            )
         else:
-            r.append('# Mail statistics: {} to {}:\n'.format(
-                self.since.isoformat(), date.today().isoformat()))
+            r.append(
+                "# Mail statistics: {} to {}:\n".format(
+                    self.since.isoformat(), date.today().isoformat()
+                )
+            )
 
         for no, reporter in enumerate(stats, 1):
-            r.append('{}. {}'.format(no, reporter))
+            r.append("{}. {}".format(no, reporter))
             for domain in stats[reporter]:
-                r.append('   - {}: successful: {}, failure: {}'.format(domain, stats[reporter][domain]['successful'],
-                                                                       stats[reporter][domain]['failure']))
-        return '\n'.join(r)
+                r.append(
+                    "   - {}: successful: {}, failure: {}".format(
+                        domain,
+                        stats[reporter][domain]["successful"],
+                        stats[reporter][domain]["failure"],
+                    )
+                )
+        return "\n".join(r)
 
     def notify(self, force=True):
         try:
             failures, stats = self.compute_stats()
         except IMAP4.error as e:
-            return 'WARNING: failed to access the impact account - ' + str(e)
+            return "WARNING: failed to access the impact account - " + str(e)
 
         if failures > 0 or force:
             return self.format_statisics(stats, failures)
-        return ''
+        return ""
