@@ -3,11 +3,11 @@ from abc import abstractmethod
 
 class Monitor:
     @abstractmethod
-    def notify(self, force=True) -> str:
+    def notify(self, force: bool = True) -> str:
         """
         Args:
             force: return the notification message even if no thresholds have been violated.
 
         Returns:
-            The notification message to send.
+            str: The notification message to send.
         """

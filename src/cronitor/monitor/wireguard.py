@@ -30,7 +30,7 @@ class WireguardMonitor(Monitor):
             for name in glob(f"{wireguard_config_dir}/*.conf")
         }
 
-    def notify(self, force=True):
+    def notify(self, force: bool = True) -> str:
         """
         Check all configured wiregard interfaces and notify the user of frozen ones.
         """
