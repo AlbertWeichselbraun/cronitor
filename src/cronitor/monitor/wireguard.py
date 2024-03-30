@@ -19,8 +19,7 @@ from typing import Optional, NamedTuple
 
 from cronitor import Monitor
 
-WL_HANDSHAKE = ["wg", "show", "all", "latest-handshakes"]
-WL_CHANGE_ENDPOINT = ["wg", "set", "endpoint"]
+WL_HANDSHAKE = ("wg", "show", "all", "latest-handshakes")
 
 DEFAULT_TIMEOUT = 150
 
@@ -28,6 +27,10 @@ DEFAULT_TIMEOUT = 150
 class EndPoint(NamedTuple):
     host: str
     port: int
+    public_key: str
+
+    def __str__(self):
+        return f"{self.host}:{self.port}"
 
 
 class WireGuardInterface(NamedTuple):
@@ -53,14 +56,23 @@ class WireguardMonitor(Monitor):
         msg = []
         for interface_spec, endpoint in self.interfaces:
             namespace, name = interface_spec.split(":")
-            if delta := self.time_since_last_handshake(name, namespace) > self.timeout:
+            if (
+                delta := self.time_since_last_handshake(name, namespace)
+            ) > self.timeout:
                 msg.append(
-                    f"Wireguard interface {interface_spec} hasn't responded for"
-                    f"{round(delta/60)} seconds."
+                    f"Wireguard interface {interface_spec} hasn't responded for "
+                    f"{round(delta/60)} minutes."
                 )
                 if not endpoint:
                     msg.append("Cannot reconnect. No endpoint for interface specified.")
-                self.reconnect_to_wireguard_server(name, namespace, endpoint)
+                    continue
+                self.reconnect_to_wireguard_server(
+                    name,
+                    namespace,
+                    endpoint.public_key,
+                    self.get_ipaddress(endpoint.host),
+                    endpoint.port,
+                )
                 if self.time_since_last_handshake(name, namespace) > self.timeout:
                     msg.append(f"Critical: Reconnect to endpoint {endpoint} failed.")
                 else:
@@ -85,9 +97,12 @@ class WireguardMonitor(Monitor):
 
     @staticmethod
     def reconnect_to_wireguard_server(
-        name: str, namespace: str, endpoint: EndPoint
+        name: str, namespace: str, public_key: str, host: str, port: int
     ) -> None:
-        pass
+        cmd = ("wg", "set", name, "peer", public_key, "endpoint", f"{host}:{port}")
+        if namespace:
+            cmd = ("ip", "netns", "exec", namespace) + cmd
+        subprocess.run(cmd, check=True, capture_output=True, text=True)
 
     @staticmethod
     def read_host_from_wl_config(config_filename: str) -> Optional[EndPoint]:
@@ -99,14 +114,15 @@ class WireguardMonitor(Monitor):
              config_filename: path to wireguard configuration file.
 
         Returns:
-            An Endpoint tuple which consists of the host and port of the endpoint.
+            An Endpoint which consists of the host, port and public key of the endpoint.
         """
         config = configparser.ConfigParser()
         with open(config_filename) as f:
             config.read_file(f)
         try:
             host, port = config.get("Peer", "Endpoint").split(":")
-            return EndPoint(host, int(port))
+            public_key = config.get("Peer", "PublicKey")
+            return EndPoint(host, int(port), public_key)
         except configparser.NoOptionError:
             return None
 
@@ -121,12 +137,12 @@ class WireguardMonitor(Monitor):
         wg-de	KEY=	1708807507
 
         Returns:
-            The time since last handshake'.
+            The time since last handshake.
         """
         cmd = (
             WL_HANDSHAKE
             if not namespace
-            else ["ip", "netns", "exec", namespace] + WL_HANDSHAKE
+            else ("ip", "netns", "exec", namespace) + WL_HANDSHAKE
         )
         return next(
             (
