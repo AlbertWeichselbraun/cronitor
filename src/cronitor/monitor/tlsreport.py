@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
-from collections import defaultdict
-from imaplib import IMAP4_SSL, IMAP4
-from datetime import date, timedelta
-from cronitor.monitor import Monitor
 import email
+from collections import defaultdict
+from datetime import date, timedelta
 from gzip import decompress
+from imaplib import IMAP4_SSL, IMAP4
 from json import loads
+
+from cronitor.monitor import Monitor
 
 
 class TLSReportMonitor(Monitor):

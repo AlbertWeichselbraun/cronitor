@@ -1,4 +1,5 @@
 import asyncio
+
 from nio import AsyncClient
 
 from cronitor.notifier import Notifier

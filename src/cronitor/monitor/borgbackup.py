@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import subprocess
-
 from datetime import datetime, timedelta
 from json import loads
 from pathlib import Path

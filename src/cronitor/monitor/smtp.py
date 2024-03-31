@@ -1,8 +1,7 @@
 import smtplib
-
 from typing import Tuple
-from cronitor.monitor import Monitor
 
+from cronitor.monitor import Monitor
 
 TIMEOUT = 5  # default timeout: 5 seconds
 
