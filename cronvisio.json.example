@@ -30,5 +30,10 @@
                 "imap_pass": "",
                 "imap_filter": "",
 		"max_age": 7
+	},
+	"smtp_monitor": {
+		"host": "mail.example.com",
+		"outgoing_ip": "0.0.0.0",
+		"timeout": 5
 	}
 }

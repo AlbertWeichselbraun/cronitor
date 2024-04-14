@@ -3,7 +3,6 @@ from cronvisio.notifier import Notifier
 
 
 class Cronitor:
-
     @staticmethod
     def cronitor(
         monitors: list[Monitor], notifiers: list[Notifier], force: bool = False

@@ -1,11 +1,11 @@
 import asyncio
+
 from nio import AsyncClient
 
 from cronvisio.notifier import Notifier
 
 
 class MatrixNotifier(Notifier):
-
     def __init__(self, homeserver: str, user_id: str, access_token: str, room_id: str):
         self.homeserver = homeserver
         self.user_id = user_id
