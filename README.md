@@ -1,6 +1,6 @@
-# Cronitor
+# Cronvisio
 
-Monitor services through cron and notifiers.
+Monitor and system control services through cron and notifiers.
 
 ## Implemented services
 
@@ -9,6 +9,7 @@ Monitor services through cron and notifiers.
 - borg backups
 - automysqlbackup
 - amazon kindle quotes (publish quotes from Amazon Kindle on matrix)
+- wireguard
 
 ## Implemented notifiers:
 
