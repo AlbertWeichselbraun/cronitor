@@ -10,10 +10,7 @@ RE_DATE = re.compile(r"[\._](\d{4}-\d{2}-\d{2})[\._]")
 
 
 class AutoMysqlBackup(Monitor):
-<<<<<<< HEAD:src/cronvisio/monitor/automysqlbackup.py
 
-=======
->>>>>>> feature/wireguard:src/cronitor/monitor/automysqlbackup.py
     def __init__(
         self, archive_path: Path, max_age: int, date: datetime = datetime.now()
     ):
