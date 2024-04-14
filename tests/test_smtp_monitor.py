@@ -1,5 +1,5 @@
 from unittest.mock import patch
-from cronitor.monitor.smtp import SmtpMonitor
+from cronvisio.monitor.smtp import SmtpMonitor
 
 
 def test_working_smtp_server():

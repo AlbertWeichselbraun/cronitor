@@ -8,11 +8,7 @@ from quopri import decodestring
 
 from cronvisio.monitor import Monitor
 
-<<<<<<< HEAD:src/cronvisio/monitor/amazon_kindle_quotes.py
 QUOTE_CACHE_FILE = ".cronvisio-known-amazon-kindle-quotes"
-=======
-QUOTE_CACHE_FILE = ".cronitor-known-amazon-kindle-quotes"
->>>>>>> feature/wireguard:src/cronitor/monitor/amazon_kindle_quotes.py
 
 
 class AmazonKindleQuotes(Monitor):
@@ -102,10 +98,6 @@ class AmazonKindleQuotes(Monitor):
 if __name__ == "__main__":
     from json import load
 
-<<<<<<< HEAD:src/cronvisio/monitor/amazon_kindle_quotes.py
     config = load(open("cronvisio.json"))
-=======
-    config = load(open("cronitor.json"))
->>>>>>> feature/wireguard:src/cronitor/monitor/amazon_kindle_quotes.py
     akq = AmazonKindleQuotes(**config["amazon_kindle_quotes"])
     print(akq.get_quotes())

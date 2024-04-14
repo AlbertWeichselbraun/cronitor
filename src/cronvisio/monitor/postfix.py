@@ -1,12 +1,7 @@
 #!/usr/bin/env python3
 
 import subprocess
-<<<<<<< HEAD:src/cronvisio/monitor/postfix.py
 from cronvisio.monitor import Monitor
-=======
-
-from cronitor.monitor import Monitor
->>>>>>> feature/wireguard:src/cronitor/monitor/postfix.py
 
 
 class PostfixMonitor(Monitor):

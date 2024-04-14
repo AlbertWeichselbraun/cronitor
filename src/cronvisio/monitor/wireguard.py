@@ -17,7 +17,7 @@ import subprocess
 from time import time
 from typing import Optional, NamedTuple
 
-from cronitor import Monitor
+from cronvisio import Monitor
 
 WL_HANDSHAKE = ("wg", "show", "all", "latest-handshakes")
 

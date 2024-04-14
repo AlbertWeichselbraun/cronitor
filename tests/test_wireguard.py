@@ -3,7 +3,7 @@ from os.path import dirname
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
-from cronitor.monitor.wireguard import (
+from cronvisio.monitor.wireguard import (
     WireguardMonitor,
     EndPoint,
     WireGuardInterface,
@@ -13,7 +13,7 @@ from cronitor.monitor.wireguard import (
 WIREGUARD_CONFIG_DIR = Path(dirname(__file__)) / "data" / "wireguard"
 
 
-def test_wireguard_cronitor():
+def test_wireguard_cronvisio():
     wg = WireguardMonitor(
         interfaces={
             "client1": str(WIREGUARD_CONFIG_DIR / "client1.conf"),
@@ -57,7 +57,7 @@ def test_resolve_host():
 
 def test_notify_handshake_ok():
     with patch(
-        "cronitor.monitor.wireguard.WireguardMonitor.time_since_last_handshake"
+        "cronvisio.monitor.wireguard.WireguardMonitor.time_since_last_handshake"
     ) as mock_time_since_last_handshake:
         mock_time_since_last_handshake.return_value = DEFAULT_TIMEOUT - 1
         wg = WireguardMonitor(
@@ -71,7 +71,7 @@ def test_notify_handshake_ok():
 
 def test_notify_handshake_delayed():
     with patch(
-        "cronitor.monitor.wireguard.WireguardMonitor.time_since_last_handshake"
+        "cronvisio.monitor.wireguard.WireguardMonitor.time_since_last_handshake"
     ) as mock_time_since_last_handshake, patch("subprocess.run") as mock_subprocess_run:
         mock_time_since_last_handshake.return_value = DEFAULT_TIMEOUT + 1
         wg = WireguardMonitor(
