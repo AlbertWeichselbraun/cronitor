@@ -98,9 +98,9 @@ def test_notify_handshake_delayed():
         ):
             args, kwargs = call_args
             assert " ".join(args[0]) == expected_cmd
-            assert kwargs["check"] == True
-            assert kwargs["capture_output"] == True
-            assert kwargs["text"] == True
+            assert kwargs["check"]
+            assert kwargs["capture_output"]
+            assert kwargs["text"]
 
 
 def test_reconnect_to_wireguard_server():
