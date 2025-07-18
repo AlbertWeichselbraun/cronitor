@@ -1,5 +1,4 @@
 import smtplib
-from typing import Tuple
 
 from cronvisio.monitor import Monitor
 
@@ -10,7 +9,7 @@ class SmtpMonitor(Monitor):
     def __init__(
         self,
         host: str,
-        outgoing_ip: Tuple[str, int] = ("0.0.0.0", 0),
+        outgoing_ip: tuple[str, int] = ("0.0.0.0", 0),
         timeout: int = TIMEOUT,
     ):
         """
@@ -42,6 +41,7 @@ class SmtpMonitor(Monitor):
             s = smtplib.SMTP(self.host, source_address=None, timeout=self.timeout)
             s.noop()
             s.quit()
-            return True
         except (TimeoutError, ConnectionError) as _:
             return False
+        else:
+            return True

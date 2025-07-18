@@ -10,12 +10,13 @@ Logic:
   - yes => try updating the endpoint ip, return an info on the update, if successful
            and a warning otherwise.
 """
+
 import configparser
 import ipaddress
 import socket
 import subprocess
 from time import time
-from typing import Optional, NamedTuple
+from typing import NamedTuple
 
 from cronvisio import Monitor
 
@@ -56,13 +57,8 @@ class WireguardMonitor(Monitor):
         msg = []
         for interface_spec, endpoint in self.interfaces:
             namespace, name = interface_spec.split(":")
-            if (
-                delta := self.time_since_last_handshake(name, namespace)
-            ) > self.timeout:
-                msg.append(
-                    f"Wireguard interface {interface_spec} hasn't responded for "
-                    f"{round(delta/60)} minutes."
-                )
+            if (delta := self.time_since_last_handshake(name, namespace)) > self.timeout:
+                msg.append(f"Wireguard interface {interface_spec} hasn't responded for {round(delta / 60)} minutes.")
                 if not endpoint:
                     msg.append("Cannot reconnect. No endpoint for interface specified.")
                     continue
@@ -80,32 +76,32 @@ class WireguardMonitor(Monitor):
         return "\n".join(msg)
 
     @staticmethod
-    def get_ipaddress(hostname: str) -> Optional[str]:
+    def get_ipaddress(hostname: str) -> str | None:
         """
         Return the IP address for the given hostname
         """
         try:
             ipaddress.ip_address(hostname)
-            return hostname
         except ValueError:
             pass
+        else:
+            return hostname
+
         try:
             return socket.gethostbyname(hostname)
-        except socket.error as e:
+        except OSError as e:
             print(f"Error: {e}")
             return None
 
     @staticmethod
-    def reconnect_to_wireguard_server(
-        name: str, namespace: str, public_key: str, host: str, port: int
-    ) -> None:
+    def reconnect_to_wireguard_server(name: str, namespace: str, public_key: str, host: str, port: int) -> None:
         cmd = ("wg", "set", name, "peer", public_key, "endpoint", f"{host}:{port}")
         if namespace:
-            cmd = ("ip", "netns", "exec", namespace) + cmd
+            cmd = ("ip", "netns", "exec", namespace, *cmd)
         subprocess.run(cmd, check=True, capture_output=True, text=True)
 
     @staticmethod
-    def read_host_from_wl_config(config_filename: str) -> Optional[EndPoint]:
+    def read_host_from_wl_config(config_filename: str) -> EndPoint | None:
         """
         Determine the endpoints for all configured client wireguard interfaces.
         (i.e., only the interfaces that connect to an endpoint).
@@ -127,9 +123,7 @@ class WireguardMonitor(Monitor):
             return None
 
     @staticmethod
-    def time_since_last_handshake(
-        interface: str, namespace: Optional[str] = None
-    ) -> float:
+    def time_since_last_handshake(interface: str, namespace: str | None = None) -> float:
         """
         Determine the status of all wireguard connections on the given host.
 
@@ -139,17 +133,11 @@ class WireguardMonitor(Monitor):
         Returns:
             The time since last handshake.
         """
-        cmd = (
-            WL_HANDSHAKE
-            if not namespace
-            else ("ip", "netns", "exec", namespace) + WL_HANDSHAKE
-        )
+        cmd = WL_HANDSHAKE if not namespace else ("ip", "netns", "exec", namespace, *WL_HANDSHAKE)
         return next(
             (
                 time() - float(timestamp)
-                for line in subprocess.run(
-                    cmd, check=True, capture_output=True, text=True
-                ).stdout.split("\n")
+                for line in subprocess.run(cmd, check=True, capture_output=True, text=True).stdout.split("\n")
                 for iface, _, timestamp in [line.split()]
                 if iface == interface
             ),

@@ -10,16 +10,15 @@ RE_DATE = re.compile(r"[\._](\d{4}-\d{2}-\d{2})[\._]")
 
 
 class AutoMysqlBackup(Monitor):
-
-    def __init__(
-        self, archive_path: Path, max_age: int, date: datetime = datetime.now()
-    ):
+    def __init__(self, archive_path: Path, max_age: int, date: datetime | None = None):
         """
         Args:
             max_age: maximum backup age to consider in days.
             ignore_hosts: hosts to ignore (i.e., we won't trigger an alert if no backup has been conducted within
                 max_age for the hosts).
         """
+        if not date:
+            date = datetime.now()
         self.archive_path = Path(archive_path)
         self.date_threshold = date - timedelta(days=max_age)
 
@@ -29,9 +28,7 @@ class AutoMysqlBackup(Monitor):
         # determine the date of the most recent backup
         most_current_date = datetime.strptime("1900-01-01", "%Y-%m-%d")
         for path in self.archive_path.rglob("*.sql.gz"):
-            date = datetime.strptime(
-                RE_DATE.search(str(path.name)).group(1), "%Y-%m-%d"
-            )
+            date = datetime.strptime(RE_DATE.search(str(path.name)).group(1), "%Y-%m-%d")
             if date > most_current_date:
                 most_current_date = date
 

@@ -2,14 +2,15 @@
 """
 Cronitor
 """
+
 import sys
 from json import load
 
 from cronvisio import Cronitor
 from cronvisio.monitor.amazon_kindle_quotes import AmazonKindleQuotes
 from cronvisio.monitor.automysqlbackup import AutoMysqlBackup
-from cronvisio.monitor.postfix import PostfixMonitor
 from cronvisio.monitor.borgbackup import BorgBackupMonitor
+from cronvisio.monitor.postfix import PostfixMonitor
 from cronvisio.monitor.tlsreport import TLSReportMonitor
 from cronvisio.notifier.matrix import MatrixNotifier
 

@@ -1,9 +1,7 @@
-import gzip
-from cronvisio.monitor.automysqlbackup import AutoMysqlBackup
-from datetime import timedelta, datetime
-
-from cronvisio.monitor.borgbackup import BorgBackupMonitor
+from datetime import datetime
 from pathlib import Path
+
+from cronvisio.monitor.automysqlbackup import AutoMysqlBackup
 
 AUTOMYSQLBACKUP_TEST_DIR = Path(__file__).parent / "data" / "automysqlbackup"
 

@@ -1,12 +1,10 @@
 import gzip
-from datetime import timedelta, datetime
-
-from cronvisio.monitor.borgbackup import BorgBackupMonitor
+from datetime import datetime
 from pathlib import Path
 
-EXAMPLE_OUTPUT = gzip.open(
-    Path(__file__).parent / "data" / "borgbackup.json.gz", "rt"
-).read()
+from cronvisio.monitor.borgbackup import BorgBackupMonitor
+
+EXAMPLE_OUTPUT = gzip.open(Path(__file__).parent / "data" / "borgbackup.json.gz", "rt").read()
 
 
 def test_parse_borgbackup_output():

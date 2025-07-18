@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import subprocess
-
 from datetime import datetime, timedelta
 from json import loads
 from pathlib import Path
@@ -10,14 +9,13 @@ from cronvisio.monitor import Monitor
 
 
 class BorgBackupMonitor(Monitor):
-
     def __init__(
         self,
         archive_path: Path,
         max_age: int,
         min_backup_count: int = 0,
-        ignore_archives: list[str] = tuple(),
-        ignore_hosts: list[str] = tuple(),
+        ignore_archives: list[str] = (),
+        ignore_hosts: list[str] = (),
     ):
         """
         Args:
@@ -37,42 +35,36 @@ class BorgBackupMonitor(Monitor):
             if not path.is_dir() or path.name in self.ignore_archives:
                 continue
             backups = self.parse_borgbackup_output(
-                subprocess.check_output(["borg", "list", "--json", str(path)]).decode(
-                    "utf-8"
-                )
+                subprocess.check_output(["borg", "list", "--json", str(path)]).decode("utf-8")
             )
             notification_required = any(
                 (
                     host
                     for host, last_backups in backups.items()
-                    if self.min_backup_count
-                    and len(last_backups) < self.min_backup_count
+                    if self.min_backup_count and len(last_backups) < self.min_backup_count
                 )
             )
             if notification_required or force:
                 msg.append(f"\n# Backups in archive {path}:")
                 msg += [
-                    f'- {host}: {", ".join(b.strftime("%Y-%m-%d") for b in last_backups)}'
+                    f"- {host}: {', '.join(b.strftime('%Y-%m-%d') for b in last_backups)}"
                     for host, last_backups in backups.items()
                 ]
         return "\n".join(msg)
 
-    def parse_borgbackup_output(
-        self, out: str, current_date: datetime = datetime.now()
-    ):
+    def parse_borgbackup_output(self, out: str, current_date: datetime | None = None):
         """
         Returns:
           A map of hostnames and the corresponding backups.
         """
+        if not current_date:
+            current_date = datetime.now()
+
         archives = {}
         cutoff_date = current_date - self.max_age
         for archive in loads(out)["archives"]:
             backup_host = archive["name"].rsplit(".", 1)[0]
-            if (
-                backup_host not in archives
-                and backup_host
-                and backup_host not in self.ignore_hosts
-            ):
+            if backup_host not in archives and backup_host and backup_host not in self.ignore_hosts:
                 archives[backup_host] = []
             date = datetime.strptime(archive["start"], "%Y-%m-%dT%H:%M:%S.%f")
             if not self.max_age or date >= cutoff_date:

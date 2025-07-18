@@ -1,13 +1,13 @@
 import ipaddress
 from os.path import dirname
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from cronvisio.monitor.wireguard import (
-    WireguardMonitor,
+    DEFAULT_TIMEOUT,
     EndPoint,
     WireGuardInterface,
-    DEFAULT_TIMEOUT,
+    WireguardMonitor,
 )
 
 WIREGUARD_CONFIG_DIR = Path(dirname(__file__)) / "data" / "wireguard"
@@ -70,9 +70,12 @@ def test_notify_handshake_ok():
 
 
 def test_notify_handshake_delayed():
-    with patch(
-        "cronvisio.monitor.wireguard.WireguardMonitor.time_since_last_handshake"
-    ) as mock_time_since_last_handshake, patch("subprocess.run") as mock_subprocess_run:
+    with (
+        patch(
+            "cronvisio.monitor.wireguard.WireguardMonitor.time_since_last_handshake"
+        ) as mock_time_since_last_handshake,
+        patch("subprocess.run") as mock_subprocess_run,
+    ):
         mock_time_since_last_handshake.return_value = DEFAULT_TIMEOUT + 1
         wg = WireguardMonitor(
             interfaces={
@@ -93,9 +96,7 @@ def test_notify_handshake_delayed():
             "ip netns exec ns2 wg set client2 peer cCfEsloNFf+bEwY/W87xI7L77H+ErlItnpICl2wjlEw= "
             "endpoint 127.0.0.1:51820",
         )
-        for call_args, expected_cmd in zip(
-            mock_subprocess_run.call_args_list, expected_cmds
-        ):
+        for call_args, expected_cmd in zip(mock_subprocess_run.call_args_list, expected_cmds, strict=False):
             args, kwargs = call_args
             assert " ".join(args[0]) == expected_cmd
             assert kwargs["check"]
@@ -112,9 +113,7 @@ def test_reconnect_to_wireguard_server():
 
     with patch("subprocess.run") as mock_subprocess_run:
         # Call the function
-        WireguardMonitor.reconnect_to_wireguard_server(
-            name, namespace, public_key, host, port
-        )
+        WireguardMonitor.reconnect_to_wireguard_server(name, namespace, public_key, host, port)
 
         # Verify subprocess.run() was called with the correct command line
         expected_cmd = (
@@ -126,9 +125,7 @@ def test_reconnect_to_wireguard_server():
             "endpoint",
             f"{host}:{port}",
         )
-        mock_subprocess_run.assert_called_once_with(
-            expected_cmd, check=True, capture_output=True, text=True
-        )
+        mock_subprocess_run.assert_called_once_with(expected_cmd, check=True, capture_output=True, text=True)
 
 
 def test_reconnect_to_wireguard_server_with_namespace():
@@ -140,9 +137,7 @@ def test_reconnect_to_wireguard_server_with_namespace():
 
     with patch("subprocess.run") as mock_subprocess_run:
         # Call the function
-        WireguardMonitor.reconnect_to_wireguard_server(
-            name, namespace, public_key, host, port
-        )
+        WireguardMonitor.reconnect_to_wireguard_server(name, namespace, public_key, host, port)
 
         # Verify subprocess.run() was called with the correct command line
         expected_cmd = (
@@ -158,6 +153,4 @@ def test_reconnect_to_wireguard_server_with_namespace():
             "endpoint",
             f"{host}:{port}",
         )
-        mock_subprocess_run.assert_called_once_with(
-            expected_cmd, check=True, capture_output=True, text=True
-        )
+        mock_subprocess_run.assert_called_once_with(expected_cmd, check=True, capture_output=True, text=True)

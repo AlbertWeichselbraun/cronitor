@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 
-from collections import defaultdict
-from imaplib import IMAP4_SSL, IMAP4
-from datetime import date, timedelta
-from cronvisio.monitor import Monitor
 import email
+from collections import defaultdict
+from datetime import date, timedelta
 from gzip import decompress
+from imaplib import IMAP4, IMAP4_SSL
 from json import loads
+
+from cronvisio.monitor import Monitor
 
 
 class TLSReportMonitor(Monitor):
-
     def __init__(
         self,
         imap_server: str,
@@ -38,9 +38,7 @@ class TLSReportMonitor(Monitor):
             imap.select("INBOX")
             _, messages = imap.search(
                 None,
-                "({} SINCE {})".format(
-                    self.imap_filter, self.since.strftime("%d-%b-%Y")
-                ),
+                "({} SINCE {})".format(self.imap_filter, self.since.strftime("%d-%b-%Y")),
             )
             for msg in messages[0].split(b" "):
                 _, data = imap.fetch(msg, "(RFC822)")
@@ -67,19 +65,13 @@ class TLSReportMonitor(Monitor):
                                         stats[reporter][domain] = {}
                                     stats[reporter][domain]["successful"] = (
                                         stats[reporter][domain].get("successful", 0)
-                                        + policy["summary"][
-                                            "total-successful-session-count"
-                                        ]
+                                        + policy["summary"]["total-successful-session-count"]
                                     )
                                     stats[reporter][domain]["failure"] = (
                                         stats[reporter][domain].get("failure", 0)
-                                        + policy["summary"][
-                                            "total-failure-session-count"
-                                        ]
+                                        + policy["summary"]["total-failure-session-count"]
                                     )
-                                    failures += policy["summary"][
-                                        "total-failure-session-count"
-                                    ]
+                                    failures += policy["summary"]["total-failure-session-count"]
 
         return failures, stats
 
@@ -90,27 +82,21 @@ class TLSReportMonitor(Monitor):
         r = []
         if failures > 0:
             r.append(
-                "# {} TLS Errors reported between {} and {}!\n".format(
-                    failures, self.since.isoformat(), date.today().isoformat()
-                )
+                f"# {failures} TLS Errors reported between {self.since.isoformat()} and {date.today().isoformat()}!\n"
             )
         else:
-            r.append(
-                "# Mail statistics: {} to {}:\n".format(
-                    self.since.isoformat(), date.today().isoformat()
-                )
-            )
+            r.append(f"# Mail statistics: {self.since.isoformat()} to {date.today().isoformat()}:\n")
 
         for no, reporter in enumerate(stats, 1):
-            r.append("{}. {}".format(no, reporter))
-            for domain in stats[reporter]:
-                r.append(
-                    "   - {}: successful: {}, failure: {}".format(
-                        domain,
-                        stats[reporter][domain]["successful"],
-                        stats[reporter][domain]["failure"],
-                    )
+            r.append(f"{no}. {reporter}")
+            r.append(
+                "   - {}: successful: {}, failure: {}".format(
+                    domain,
+                    stats[reporter][domain]["successful"],
+                    stats[reporter][domain]["failure"],
                 )
+                for domain in stats[reporter]
+            )
         return "\n".join(r)
 
     def notify(self, force=True):

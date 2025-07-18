@@ -64,9 +64,7 @@ class AmazonKindleQuotes(Monitor):
         with IMAP4_SSL(self.imap_server) as imap:
             imap.login(self.imap_user, self.imap_pass)
             imap.select("INBOX")
-            _, messages = imap.search(
-                None, "(SINCE {})".format(self.since.strftime("%d-%b-%Y"))
-            )
+            _, messages = imap.search(None, "(SINCE {})".format(self.since.strftime("%d-%b-%Y")))
             for msg in messages[0].split(b" "):
                 if not msg:
                     continue
@@ -77,17 +75,10 @@ class AmazonKindleQuotes(Monitor):
                         msg = email.message_from_bytes(response[1])
                         for part in msg.walk():
                             if part.get_content_type() == "text/plain":
-                                if (
-                                    part.get("Content-Transfer-Encoding", "utf8")
-                                    == "quoted-printable"
-                                ):
-                                    mail_content = self.extract_quote(
-                                        decodestring(part.get_payload()).decode("utf8")
-                                    )
+                                if part.get("Content-Transfer-Encoding", "utf8") == "quoted-printable":
+                                    mail_content = self.extract_quote(decodestring(part.get_payload()).decode("utf8"))
                                 else:
-                                    mail_content = self.extract_quote(
-                                        part.get_payload()
-                                    )
+                                    mail_content = self.extract_quote(part.get_payload())
                         quote = self.extract_quote(mail_content)
                         if not self.is_known_quote(quote):
                             result.append(quote)

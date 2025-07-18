@@ -1,31 +1,67 @@
-[tool.poetry]
+[project]
 name = "cronvisio"
 version = "0.9.0"
 description = "cronvisio - Monitor and control services through cron and notifiers."
-authors = ["Albert Weichselbraun <albert@weichselbraun.net>"]
-license = "GPL-3.0"
+authors = [
+  { name = "Albert Weichselbraun", email = "albert@weichselbraun.net" }
+]
+license = { text = "GPL-3.0" }
 readme = "README.md"
+requires-python = ">=3.8,<3.14"
+
+dependencies = [
+  "matrix-nio>=0.24.0,<1.0.0"
+]
+
+[project.urls]
 homepage = "http://github.com/AlbertWeichselbraun/cronvisio"
 repository = "http://github.com/AlbertWeichselbraun/cronvisio"
-keywords = ["bibPublish", "bibtex", "publish"]
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-
-[tool.poetry.dependencies]
-python = "^3.8 || ^3.9 || ^3.10 || ^3.11 || ^3.12"
-matrix-nio = "^0.24.0"
-
-[tool.poetry.scripts]
+[project.scripts]
 cronvisio = "cronvisio.cli:cli"
 
-# code formatting with black
-[tool.black]
-line-length = 88
-target-version = ["py38", "py39", "py310", "py311", "py312"]
-extend-exclude = '\.html$|\.json$|\.txt$|\.gz$'
-include = '''
-  ^/src/|^/tests/|^/benchmarking/|^/examples/
-'''
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"  # adjust as needed
+extend-exclude = ["*.json", "*.conf"]
+src = ["src", "tests"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-builtins
+    "A",
+    # flake8-bugbear
+    "B",
+    # flake8-comprehensions
+    "C4",
+    # flake8-errmsg
+    "EM",
+    # flake8-quotes
+    "Q",
+    # flake8-pyi
+    "PYI",
+    # isort
+    "I",
+    "RSE", "RET", "SLOT", "TID", "TC", "C90", "N", "PERF", "E", "W",
+    "UP", "FURB", "RUF", "TRY", "YTT"
+]
+
+[tool.ty.src]
+root="./src"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=cronvisio --cov-report=term-missing"
