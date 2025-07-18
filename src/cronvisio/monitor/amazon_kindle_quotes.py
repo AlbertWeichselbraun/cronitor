@@ -68,6 +68,8 @@ class AmazonKindleQuotes(Monitor):
                 None, "(SINCE {})".format(self.since.strftime("%d-%b-%Y"))
             )
             for msg in messages[0].split(b" "):
+                if not msg:
+                    continue
                 _, data = imap.fetch(msg, "(RFC822)")
 
                 for response in data:
