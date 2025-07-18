@@ -5,8 +5,8 @@ description = "cronvisio - Monitor and control services through cron and notifie
 authors = ["Albert Weichselbraun <albert@weichselbraun.net>"]
 license = "GPL-3.0"
 readme = "README.md"
-homepage = "http://github.com/AlbertWeichselbraun/cronitor"
-repository = "http://github.com/AlbertWeichselbraun/cronitor"
+homepage = "http://github.com/AlbertWeichselbraun/cronvisio"
+repository = "http://github.com/AlbertWeichselbraun/cronvisio"
 keywords = ["bibPublish", "bibtex", "publish"]
 
 [build-system]
