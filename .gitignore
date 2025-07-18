@@ -5,3 +5,5 @@ cronitor.json
 .idea/
 .cronitor-known-amazon-kindle-quotes
 poetry.lock
+venv/
+.venv/
