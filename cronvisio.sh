@@ -3,4 +3,4 @@
 source ./.venv/bin/activate
 export PYTHONPATH=$PYTHONPATH:./src
 
-python3 ./src/cronvisio/cli.py
+python3 ./src/cronvisio/cli.py $1
